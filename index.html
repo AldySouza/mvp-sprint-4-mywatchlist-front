@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MyWatchList</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <nav class="container d-flex align-items-center justify-content-between py-3">
+      <a class="brand" href="#">
+        <span class="brand-mark"><i class="bi bi-play-fill"></i></span>
+        MyWatch<span class="brand-accent">List</span>
+      </a>
+      <a class="nav-link-soft" href="#favorites-section"><i class="bi bi-bookmark-heart me-1"></i>Minha lista</a>
+    </nav>
+
+    <div class="container hero-body">
+      <h1 class="hero-title">Sua lista de séries,<br><span class="text-gradient">do seu jeito.</span></h1>
+      <p class="hero-subtitle">Busque qualquer série, dê a sua nota e acompanhe o que você mais gosta de assistir.</p>
+      <div class="search-box">
+        <i class="bi bi-search search-icon" aria-hidden="true"></i>
+        <input
+          id="search-input"
+          type="search"
+          class="form-control form-control-lg"
+          placeholder="Busque uma série — ex: Breaking Bad, Dark, The Office…"
+          autocomplete="off"
+          aria-label="Buscar séries"
+        >
+      </div>
+    </div>
+  </header>
+
+  <main class="container pb-5">
+    <section id="search-section" class="section">
+      <div id="search-status" class="status-msg" hidden></div>
+      <div id="search-results" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 g-md-4"></div>
+    </section>
+
+    <section id="stats-section" class="section" aria-labelledby="stats-title">
+      <div class="section-header">
+        <h2 id="stats-title" class="section-title"><i class="bi bi-bar-chart-line"></i> Painel da minha lista</h2>
+      </div>
+      <div class="row g-3">
+        <div class="col-12 col-lg-4">
+          <div class="row g-3 h-100">
+            <div class="col-6 col-lg-12">
+              <div class="panel stat-tile h-100">
+                <span class="stat-icon"><i class="bi bi-collection-play"></i></span>
+                <div>
+                  <div class="stat-label">Séries favoritas</div>
+                  <div class="stat-value" id="stat-total">–</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-lg-12">
+              <div class="panel stat-tile h-100">
+                <span class="stat-icon stat-icon-gold"><i class="bi bi-star-fill"></i></span>
+                <div>
+                  <div class="stat-label">Nota média</div>
+                  <div class="stat-value"><span id="stat-media">–</span><span class="stat-unit"> / 5</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-8">
+          <div class="panel h-100">
+            <h3 class="panel-title">Distribuição das notas</h3>
+            <div id="chart-notas" class="bar-chart" role="list"></div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="panel">
+            <h3 class="panel-title">Favoritos por gênero</h3>
+            <div id="chart-generos" class="bar-chart" role="list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="favorites-section" class="section">
+      <div class="section-header flex-wrap gap-2">
+        <h2 class="section-title"><i class="bi bi-bookmark-heart"></i> Minhas séries favoritas</h2>
+        <div class="d-flex gap-2 filters">
+          <select id="genre-filter" class="form-select form-select-sm" aria-label="Filtrar por gênero">
+            <option value="">Todos os gêneros</option>
+          </select>
+          <input type="checkbox" class="btn-check" id="sort-by-rating" autocomplete="off">
+          <label class="btn btn-sm btn-outline-accent text-nowrap" for="sort-by-rating"><i class="bi bi-sort-down me-1"></i>Por nota</label>
+        </div>
+      </div>
+      <div id="favorites-status" class="status-msg" hidden></div>
+      <div id="favorites-list" class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 g-md-4"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Dados de séries fornecidos por <a href="https://www.tvmaze.com" target="_blank" rel="noopener">TVMaze.com</a>
+      sob licença <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+    </div>
+  </footer>
+
+  <!-- Modal de adicionar aos favoritos -->
+  <div class="modal fade" id="add-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="add-form">
+          <div class="modal-header">
+            <h5 class="modal-title">Adicionar aos favoritos</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-show-name" id="add-show-name"></p>
+            <div class="mb-3">
+              <label class="form-label" for="add-rating">Sua nota (1 a 5)</label>
+              <select id="add-rating" class="form-select" required>
+                <option value="" disabled selected>Escolha uma nota</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="add-comment">Comentário (opcional)</label>
+              <textarea id="add-comment" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-accent">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de edição -->
+  <div class="modal fade" id="edit-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="edit-form">
+          <input type="hidden" id="edit-id">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar favorito</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-show-name" id="edit-show-name"></p>
+            <div class="mb-3">
+              <label class="form-label" for="edit-rating">Nota (1 a 5)</label>
+              <select id="edit-rating" class="form-select" required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="edit-comment">Comentário</label>
+              <textarea id="edit-comment" class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-accent">Salvar alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmação de exclusão -->
+  <div class="modal fade" id="delete-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Remover favorito</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja remover <strong id="delete-show-name"></strong> dos seus favoritos?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="delete-confirm-btn">Remover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toasts -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast align-items-center border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="toast-body"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

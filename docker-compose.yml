@@ -1,0 +1,21 @@
+services:
+  mywatchlist-api:
+    build:
+      context: ../mywatchlist-api
+    container_name: mywatchlist-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - mywatchlist-data:/app/data
+
+  mywatchlist-front:
+    build:
+      context: .
+    container_name: mywatchlist-front
+    ports:
+      - "3001:80"
+    depends_on:
+      - mywatchlist-api
+
+volumes:
+  mywatchlist-data:

@@ -1,0 +1,22 @@
+flowchart LR
+    subgraph Browser["🖥️ Navegador do usuário"]
+        UI["Interface MyWatchList<br/>HTML · CSS · JS + Bootstrap"]
+    end
+
+    subgraph Docker["🐳 Docker Compose"]
+        Front["mywatchlist-front<br/>Nginx · porta 3001"]
+        API["mywatchlist-api<br/>FastAPI · porta 8000"]
+        DB[("SQLite<br/>favoritos.db<br/>volume mywatchlist-data")]
+    end
+
+    TVMaze["☁️ TVMaze API (externa)<br/>api.tvmaze.com"]
+
+    Front -- "1. entrega HTML/CSS/JS" --> UI
+    UI -- "2. GET /search/shows?q=<br/>(busca de séries)" --> TVMaze
+    UI -- "3. REST: GET · POST · PUT · DELETE<br/>/favoritos e /favoritos/estatisticas" --> API
+    API -- "SQLAlchemy" --> DB
+
+    classDef mine fill:#fde8d7,stroke:#c46a2b,color:#222
+    classDef ext fill:#cfe0fb,stroke:#3a6fc4,color:#222
+    class Front,API,DB,UI mine
+    class TVMaze ext
