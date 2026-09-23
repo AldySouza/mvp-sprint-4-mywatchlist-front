@@ -1,7 +1,7 @@
 services:
   mywatchlist-api:
     build:
-      context: ../mywatchlist-api
+      context: ../mvp-sprint-4-mywatchlist-front
     container_name: mywatchlist-api
     ports:
       - "8000:8000"
