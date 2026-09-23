@@ -2,7 +2,7 @@
 # pre-instalado.
 #
 # Verifica (e instala, se faltar) o Python na versao certa e o Docker, e baixa
-# o repositorio da API se ele nao estiver ao lado deste (..\mywatchlist-api).
+# o repositorio da API se ele nao estiver ao lado deste (..\mvp-sprint-4-mywatchlist-api).
 # Com o Docker rodando, sobe tudo via docker compose; se o Docker nao ficar
 # pronto (ex.: recem-instalado e pedindo reinicializacao), sobe com Python local.
 #
@@ -20,7 +20,7 @@ $frontPort = 3001
 $apiPort = 8000  # fixo em app.js (API_BASE_URL)
 $apiUrl = "http://localhost:$apiPort"
 $frontUrl = "http://localhost:$frontPort"
-$apiDir = Join-Path (Split-Path $PSScriptRoot -Parent) "mywatchlist-api"
+$apiDir = Join-Path (Split-Path $PSScriptRoot -Parent) "mvp-sprint-4-mywatchlist-api"
 $apiRepo = "https://github.com/AldySouza/mvp-sprint-4-mywatchlist-api"
 # pydantic 2.9 / fastapi 0.115 (API) tem wheels prontos do Python 3.10 ao 3.13.
 $pyVersionCheck = "import sys; sys.exit(0 if (3, 10) <= sys.version_info[:2] <= (3, 13) else 1)"

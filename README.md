@@ -117,7 +117,7 @@ Exemplo de resposta (resumida):
 Funciona num computador **sem nada instalado**: só precisa deste repositório. O script:
 
 1. verifica se há um **Python 3.10 a 3.13** e, se não houver, instala o Python 3.12 (Homebrew ou python.org no macOS; `apt`/`dnf`/`pacman`/… no Linux; `winget` ou python.org no Windows);
-2. se a pasta `../mywatchlist-api` não existir, **baixa o repositório da API** ao lado deste (com `git clone` ou, sem Git, baixando o `.zip`/`.tar.gz` do GitHub);
+2. se a pasta `../mvp-sprint-4-mywatchlist-api` não existir, **baixa o repositório da API** ao lado deste (com `git clone` ou, sem Git, baixando o `.zip`/`.tar.gz` do GitHub);
 3. verifica se o **Docker** está instalado e rodando; se não estiver instalado, instala (Docker Desktop no macOS/Windows, Docker Engine no Linux) e tenta iniciá-lo;
 4. com o Docker pronto, sobe **front + API** via `docker compose`;
 5. se o Docker não ficar pronto (por exemplo, recém-instalado e pedindo reinicialização ou novo login), sobe tudo **com Python local**: roda o `start` da API em modo local (que cria a `.venv` e instala as dependências) e serve o front com `python -m http.server`;
@@ -169,20 +169,20 @@ Ou baixe o instalador em https://www.python.org/downloads/.
 ```bash
 mkdir mywatchlist && cd mywatchlist
 git clone https://github.com/AldySouza/mvp-sprint-4-mywatchlist-front.git mywatchlist-front
-git clone https://github.com/AldySouza/mvp-sprint-4-mywatchlist-api.git mywatchlist-api
+git clone https://github.com/AldySouza/mvp-sprint-4-mywatchlist-api.git
 ```
 
 ```
 mywatchlist/
 ├── mywatchlist-front/   ← este repositório (com o docker-compose.yml)
-└── mywatchlist-api/
+└── mvp-sprint-4-mywatchlist-api/
 ```
 
 **3. Terminal 1: crie a *virtualenv* da API, instale as dependências e suba a API**
 
 ```bash
 # macOS / Linux
-cd mywatchlist-api
+cd mvp-sprint-4-mywatchlist-api
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -191,7 +191,7 @@ uvicorn app.main:app --port 8000
 
 ```powershell
 # Windows (PowerShell)
-cd mywatchlist-api
+cd mvp-sprint-4-mywatchlist-api
 py -3.12 -m venv .venv
 .venv\Scripts\Activate.ps1          # no CMD: .venv\Scripts\activate.bat
 pip install -r requirements.txt
@@ -211,7 +211,7 @@ Acesse **http://localhost:3001**. Para parar: `Ctrl+C` em cada terminal.
 
 ### Opção 3: passo a passo manual com Docker
 
-Pré-requisitos: [Docker](https://docs.docker.com/get-docker/) com Docker Compose (já vem no Docker Desktop) instalado e rodando, e os dois repositórios clonados lado a lado como no passo 2 acima. O `docker-compose.yml` deste repositório builda a API a partir de `../mywatchlist-api`, então as pastas precisam ter esses nomes.
+Pré-requisitos: [Docker](https://docs.docker.com/get-docker/) com Docker Compose (já vem no Docker Desktop) instalado e rodando, e os dois repositórios clonados lado a lado como no passo 2 acima. O `docker-compose.yml` deste repositório builda a API a partir de `../mvp-sprint-4-mywatchlist-api`, então as pastas precisam ter esses nomes.
 
 ```bash
 cd mywatchlist-front
