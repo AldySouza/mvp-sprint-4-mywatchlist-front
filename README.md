@@ -112,15 +112,59 @@ Exemplo de resposta (resumida):
 
 ## 🚀 Como rodar
 
-### Pré-requisitos
+### Opção 1: script `start` (recomendado)
 
-- [Docker](https://docs.docker.com/get-docker/) com Docker Compose (já vem no Docker Desktop)
-- [Git](https://git-scm.com/)
-- Portas **3001** e **8000** livres
+Funciona num computador **sem nada instalado**: só precisa deste repositório. O script:
 
-### 1. Clone os dois repositórios lado a lado
+1. verifica se há um **Python 3.10 a 3.13** e, se não houver, instala o Python 3.12 (Homebrew ou python.org no macOS; `apt`/`dnf`/`pacman`/… no Linux; `winget` ou python.org no Windows);
+2. se a pasta `../mywatchlist-api` não existir, **baixa o repositório da API** ao lado deste (com `git clone` ou, sem Git, baixando o `.zip`/`.tar.gz` do GitHub);
+3. verifica se o **Docker** está instalado e rodando; se não estiver instalado, instala (Docker Desktop no macOS/Windows, Docker Engine no Linux) e tenta iniciá-lo;
+4. com o Docker pronto, sobe **front + API** via `docker compose`;
+5. se o Docker não ficar pronto (por exemplo, recém-instalado e pedindo reinicialização ou novo login), sobe tudo **com Python local**: roda o `start` da API em modo local (que cria a `.venv` e instala as dependências) e serve o front com `python -m http.server`;
+6. abre o navegador na aplicação assim que ela responde.
 
-O `docker-compose.yml` deste repositório builda a API a partir de `../mywatchlist-api`, então os dois precisam estar no mesmo diretório pai **e com esses nomes de pasta** (por isso o nome no final de cada `git clone`):
+```bash
+git clone https://github.com/AldySouza/mvp-sprint-4-mywatchlist-front.git mywatchlist-front
+cd mywatchlist-front
+```
+
+| Sistema | Comando |
+|---|---|
+| macOS / Linux | `./start.sh` |
+| Windows (duplo clique ou CMD) | `start.bat` |
+| Windows (PowerShell) | `.\start.ps1` |
+
+Sem Docker, direto com Python local: `./start.sh --local` (Windows: `start.bat -Local` ou `.\start.ps1 -Local`). No Windows, nesse modo, a API abre numa janela própria com os logs dela.
+
+A instalação de Python/Docker pode pedir a senha de administrador. As portas **3001** (front) e **8000** (API) precisam estar livres. Nas execuções seguintes nada é reinstalado.
+
+**Para parar:** `Ctrl+C` (para front e API). No modo Docker, os favoritos ficam salvos no volume; para apagá-los também, use `docker compose down -v`.
+
+### Acesse
+
+| O quê | URL |
+|---|---|
+| 🎬 Aplicação | http://localhost:3001 |
+| 📘 Swagger da API | http://localhost:8000/docs |
+
+Na primeira execução a API já cria 5 séries de exemplo, para a lista e o painel não começarem vazios.
+
+### Opção 2: passo a passo manual com Python
+
+Faz o mesmo que o `start --local`, um comando por vez. Precisa de dois terminais: um para a API e outro para o front.
+
+**1. Instale o Python 3.12** (qualquer versão de 3.10 a 3.13 serve). Confira com `python3 --version` (Windows: `py -3.12 --version`). Se não tiver:
+
+| Sistema | Comando |
+|---|---|
+| macOS (Homebrew) | `brew install python@3.12` |
+| Ubuntu / Debian | `sudo apt-get install python3.12 python3.12-venv` |
+| Fedora | `sudo dnf install python3.12` |
+| Windows | `winget install -e --id Python.Python.3.12` |
+
+Ou baixe o instalador em https://www.python.org/downloads/.
+
+**2. Clone os dois repositórios lado a lado**
 
 ```bash
 mkdir mywatchlist && cd mywatchlist
@@ -134,41 +178,47 @@ mywatchlist/
 └── mywatchlist-api/
 ```
 
-### 2. Suba tudo com um comando
+**3. Terminal 1: crie a *virtualenv* da API, instale as dependências e suba a API**
+
+```bash
+# macOS / Linux
+cd mywatchlist-api
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000
+```
+
+```powershell
+# Windows (PowerShell)
+cd mywatchlist-api
+py -3.12 -m venv .venv
+.venv\Scripts\Activate.ps1          # no CMD: .venv\Scripts\activate.bat
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000
+```
+
+**4. Terminal 2: sirva o front**
+
+O front é HTML/CSS/JS puro, sem *build* nem dependências (o Bootstrap vem via CDN): basta um servidor estático.
+
+```bash
+cd mywatchlist-front
+python3 -m http.server 3001        # Windows: py -3.12 -m http.server 3001
+```
+
+Acesse **http://localhost:3001**. Para parar: `Ctrl+C` em cada terminal.
+
+### Opção 3: passo a passo manual com Docker
+
+Pré-requisitos: [Docker](https://docs.docker.com/get-docker/) com Docker Compose (já vem no Docker Desktop) instalado e rodando, e os dois repositórios clonados lado a lado como no passo 2 acima. O `docker-compose.yml` deste repositório builda a API a partir de `../mywatchlist-api`, então as pastas precisam ter esses nomes.
 
 ```bash
 cd mywatchlist-front
 docker compose up --build
 ```
 
-Ou use o script, que também verifica se o Docker está instalado e tenta iniciá-lo se estiver parado:
-
-| Sistema | Comando |
-|---|---|
-| macOS / Linux | `./start.sh` |
-| Windows (CMD) | `start.bat` |
-| Windows (PowerShell) | `.\start.ps1` |
-
-### 3. Acesse
-
-| O quê | URL |
-|---|---|
-| 🎬 Aplicação | http://localhost:3001 |
-| 📘 Swagger da API | http://localhost:8000/docs |
-
-Na primeira execução a API já cria 5 séries de exemplo, para a lista e o painel não começarem vazios.
-
 **Para parar:** `Ctrl+C`, ou `docker compose down`. Os favoritos ficam salvos no volume; para apagá-los também, use `docker compose down -v`.
-
-### Alternativa: sem Docker
-
-O front é HTML/CSS/JS puro, sem *build*: basta um servidor estático. Suba primeiro a API (veja o [README da mywatchlist-api](https://github.com/AldySouza/mvp-sprint-4-mywatchlist-api#readme)) e depois:
-
-```bash
-./run.sh            # porta 3001 (padrão)
-./run.sh 8080       # ou outra porta
-# equivalente a: python3 -m http.server 8080
-```
 
 ---
 
@@ -181,8 +231,7 @@ mywatchlist-front/
 ├── app.js               # Lógica: chamadas à TVMaze e à API, renderização, eventos
 ├── Dockerfile           # Imagem Nginx que serve os arquivos estáticos
 ├── docker-compose.yml   # Sobe front + API juntos (com volume do banco)
-├── start.sh / .bat / .ps1   # Atalhos de inicialização com checagem do Docker
-├── run.sh               # Execução sem Docker (servidor estático)
+├── start.sh / .bat / .ps1   # Verifica/instala Python e Docker e sobe front + API
 └── docs/
     ├── arquitetura.png  # Diagrama de arquitetura
     ├── arquitetura.mmd  # Fonte do diagrama (Mermaid)
